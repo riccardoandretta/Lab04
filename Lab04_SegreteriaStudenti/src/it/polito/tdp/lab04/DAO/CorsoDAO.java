@@ -33,8 +33,6 @@ public class CorsoDAO {
 				String nome = rs.getString("nome");
 				int periodoDidattico = rs.getInt("pd");
 
-//				System.out.println(codins + " " + numeroCrediti + " " + nome + " " + periodoDidattico);
-
 				Corso c = new Corso(codins, numeroCrediti, nome, periodoDidattico);
 				corsi.add(c);
 				
@@ -81,7 +79,7 @@ public class CorsoDAO {
 	 */
 	public List<Studente> getStudentiIscrittiAlCorso(Corso corso) {
 
-		String sql = "SELECT matricola  FROM iscrizione WHERE codins = ?";
+		String sql = "SELECT s.matricola, nome, cognome, cds  FROM studente as s, iscrizione as i WHERE s.matricola = i.matricola and i.codins = ?";
 		List<Studente> studenti = new LinkedList<>();
 
 		try {
@@ -91,9 +89,9 @@ public class CorsoDAO {
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
-				Studente s = new Studente();
-				s.setMatricola(rs.getInt("matricola"));
-				studenti.add(s);
+				Studente studente = new Studente(rs.getInt("matricola"), rs.getString("nome"),
+						rs.getString("cognome"), rs.getString("cds"));
+				studenti.add(studente);
 			}
 
 //			conn.close();
@@ -112,7 +110,7 @@ public class CorsoDAO {
 	public boolean inscriviStudenteACorso(Studente studente, Corso corso) {
 
 		String sql = "INSERT INTO iscrizione (matricola, codins) VALUES (?, ?)";
-		boolean res;
+		boolean returnValue = false;
 
 		try {
 			Connection conn = ConnectDB.getConnection();
@@ -120,7 +118,10 @@ public class CorsoDAO {
 			st.setInt(1, studente.getMatricola());
 			st.setString(2, corso.getCodIns());
 
-			res = st.execute();
+			int res = st.executeUpdate();	
+
+			if (res == 1)
+				returnValue = true;
 
 //			conn.close();
 
@@ -128,6 +129,6 @@ public class CorsoDAO {
 			throw new RuntimeException(e);
 		}
 		// ritorna true se l'iscrizione e' avvenuta con successo
-		return res;
+		return returnValue;
 	}
 }

@@ -5,7 +5,7 @@ import it.polito.tdp.lab04.DAO.CorsoDAO;
 import it.polito.tdp.lab04.DAO.StudenteDAO;
 
 public class Model {
-	
+
 	private List<Corso> corsi;
 	private CorsoDAO corsoDAO = null;
 	private StudenteDAO studenteDAO = null;
@@ -23,8 +23,21 @@ public class Model {
 		return this.corsi;
 	}
 
+	public void getCorso(Corso corso) {
+		corsoDAO.getCorso(corso);
+	}
+
+	public List<Corso> getCorsiByStudente(Studente studente) {
+		return studenteDAO.getCorsiByStudente(studente.getMatricola());
+
+	}
+
+	public Studente getStudente(int matricola) {
+		return studenteDAO.getStudenteByMatricola(matricola);
+	}
+
 	public List<Studente> getStudentiIscrittiAlCorso(Corso corso) {
-		// opzione 2: faccio lavorare il database
+		// faccio lavorare il database
 		return corsoDAO.getStudentiIscrittiAlCorso(corso);
 	}
 
@@ -37,11 +50,13 @@ public class Model {
 		}
 		return s.getNome() + " " + s.getCognome();
 	}
-
-	public List<Studente> getStudentiIscrittiAlCorso(String codins) {
-		List<Studente> studenti = studenteDAO.getStudentiByCodins(codins);
-		return studenti;
+	
+	public boolean isStudenteIscrittoACorso(Studente studente, Corso corso) {
+		return studenteDAO.isStudenteIscrittoACorso(studente, corso);
 	}
-
+	
+	public boolean inscriviStudenteACorso(Studente studente, Corso corso) {
+		return corsoDAO.inscriviStudenteACorso(studente, corso);
+	}
 
 }
